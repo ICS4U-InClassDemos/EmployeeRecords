@@ -17,6 +17,7 @@ namespace EmployeeRecords
         public mainForm()
         {
             InitializeComponent();
+            loadDB();
         }
 
         private void addButton_Click(object sender, EventArgs e)
@@ -37,7 +38,22 @@ namespace EmployeeRecords
 
         private void removeButton_Click(object sender, EventArgs e)
         {
-           
+            string searchID = idInput.Text;
+
+            foreach (Employee emp in employeeDB)
+            {
+                if (emp.id == searchID)
+                {
+                    outputLabel.Text = "Employee " + searchID + " removed";
+
+                    employeeDB.Remove(emp);
+                    ClearLabels();
+                    break;
+                }
+            }
+
+            outputLabel.Text = "Employee ID not found";
+            ClearLabels();
         }
 
         private void listButton_Click(object sender, EventArgs e)
@@ -66,7 +82,35 @@ namespace EmployeeRecords
 
         public void loadDB()
         {
-            
+            string id, firstName, lastName, date, salary;
+
+            XmlReader reader = XmlReader.Create("Resources/employeeData.xml");
+
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Text) 
+                {
+                    id = reader.ReadString();
+
+                    reader.ReadToNextSibling("firstName");
+                    firstName = reader.ReadString();
+
+                    reader.ReadToNextSibling("lastName");
+                    lastName = reader.ReadString();
+
+                    reader.ReadToNextSibling("date");
+                    date= reader.ReadString();
+
+                    reader.ReadToNextSibling("salary");
+                    salary= reader.ReadString();
+
+                    Employee newEmployee = new Employee(id, firstName, lastName, date, salary);
+                    employeeDB.Add(newEmployee);
+                }
+            }
+
+            reader.Close();
+
         }
 
         public void saveDB()
